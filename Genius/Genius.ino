@@ -9,14 +9,17 @@
 #define NOTE_A5  349
  
 int tons[4] = { NOTE_A5, NOTE_A4, NOTE_G4, NOTE_D4 };    // Sortea os sons utilizados
-int sequencia[6] = {};                                 // Inicia sequencial de até 6 variáveis
+int sequencia[100] = {};                                 // Inicia sequencial de até 6 variáveis
 int rodada_atual = 0;                                    // Indica a rodada do jogo
 int passo_atual_na_sequencia = 0;                        // Indica a situação atual da sequecia
  
-int pinoAudio = 6;                       // Define o pino de áudio
-int pinosLeds[4] = { 8, 9, 10, 11 };     // Define os pinos dos LEDs
+int pinoAudio = 13;                       // Define o pino de áudio
+int pinosLeds[4] = { 8, 9, 10, 11};     // Define os pinos dos LEDs
 int pinosBotoes[4] = { 2, 3, 4, 5 };     // Define os pinos dos buttons
- 
+int LED1 = 6;
+int LED2 = 7;
+int LED3 = 12;
+
 int botao_pressionado = 0;  // Inicializa botão em 0
 int perdeu_o_jogo = false;  // Variável fim de jogo
 int fim = false;  // fim das tentativas
@@ -24,12 +27,17 @@ int fim = false;  // fim das tentativas
 int contador=0; // Contagem de rodadas
  
 void setup() {
+  Serial.begin(9600);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+
   for (int i = 0; i <= 3; i++) {
     pinMode(pinosLeds[i], OUTPUT);   // Define o pino dos LEDs como saída
   }
  
   for (int i = 0; i <= 3; i++) {
-    pinMode(pinosBotoes[i], INPUT);  // Define o pino dos botões como entrada
+    pinMode(pinosBotoes[i], INPUT_PULLUP);  // Define o pino dos botões como entrada
   }
  
   pinMode(pinoAudio, OUTPUT);        // Define o pino de áudio como saída
@@ -37,13 +45,19 @@ void setup() {
 }
  
 void loop() {
+    
     if (perdeu_o_jogo) {            // Se acabar o jogo reinicia todas as variáveis
-    int sequencia[6] = {};
+    int sequencia[100] = {};
     rodada_atual = 0;
     passo_atual_na_sequencia = 0;
     perdeu_o_jogo = false;
     fim = false;
     contador = 0;
+    
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, LOW);
+
   }
  
   if (rodada_atual == 0) {  // Som para inicialização da rodada
@@ -65,15 +79,19 @@ void loop() {
  
 void proximaRodada() {  // Sorteia o novo item da rodada
   contador++;
-  if(contador <= 5){
-    int numero_sorteado = random(0, 4);
-    sequencia[rodada_atual++] = numero_sorteado;
+  int numero_sorteado = random(0, 4);
+  sequencia[rodada_atual++] = numero_sorteado;
+  if(contador >= 3){
+    digitalWrite(LED1, HIGH);
   }
-  else{
-    decode_pontuacao(contador);
-    fim = true;
+  if(contador >=7){
+    digitalWrite(LED2, HIGH);
+    //decode_pontuacao(contador);
+    //fim = true;
+  }if(contador >=10){
+    digitalWrite(LED3, HIGH);
   }
- 
+  Serial.println(contador);
 }
  
 void reproduzirSequencia() {  // Reproduz a sequencia selecionada
@@ -113,7 +131,7 @@ void aguardarJogada() {
   boolean jogada_efetuada = false;
   while (!jogada_efetuada) {
     for (int i = 0; i <= 3; i++) {
-      if (digitalRead(pinosBotoes[i]) == HIGH) {
+      if (digitalRead(pinosBotoes[i]) == LOW) {
         botao_pressionado = i; // Indica o botão pressionado
         tone(pinoAudio, tons[i]);
         digitalWrite(pinosLeds[i], HIGH);
@@ -130,7 +148,7 @@ void aguardarJogada() {
  
 void verificarJogada() {
   if (sequencia[passo_atual_na_sequencia] != botao_pressionado) {
-    decode_pontuacao(contador);
+    //decode_pontuacao(contador);
     fim = true;
     perdeu_o_jogo = true;
   }
@@ -151,7 +169,7 @@ void tocarSomDeInicio() {
   noTone(pinoAudio);
 }
 
-void decode_pontuacao(int cont){
+/*void decode_pontuacao(int cont){
   digitalWrite(pinosLeds[0], HIGH);
   digitalWrite(pinosLeds[1], HIGH);
   digitalWrite(pinosLeds[2], HIGH);
@@ -176,4 +194,4 @@ void decode_pontuacao(int cont){
   }  
    delay(2000);
   
-}
+}*/
