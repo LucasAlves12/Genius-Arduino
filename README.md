@@ -14,6 +14,10 @@ Para montar o jogo Genius com Arduino, você precisará dos seguintes componente
 - Jumpers
 - Protoboard
 
+## Esquemático:
+
+<img src=".\esquematico-genius.jpg" alt="genius" width="auto"  height="auto" />
+
 ## Como Funciona o Jogo
 
 O jogo Genius é um jogo de memória. Ele acende um LED aleatório e toca uma nota correspondente no buzzer. O jogador deve então pressionar o botão correspondente ao LED que acendeu. Se o jogador acertar, o jogo repete a sequência e adiciona mais um LED aleatório no final. O jogo continua até que o jogador erre a sequência ou atinja a pontuação de 5 acertos (pontuação máxima).
